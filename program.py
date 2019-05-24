@@ -1,14 +1,15 @@
 from scipy.optimize import linprog
 import numpy as np
 import pulp as plp
+import math
 
 print("Weaving problem")
 
 # configuration
 n = 5 # first dimension of the image
 m = 5 # second dimension of the image
-resPixel = 3
-numWires = 4
+resPixel = 5
+numWires = 5 
 
 # A = np.zeros((n, m, 3))
 A = np.random.uniform(0.0, 1.0, (n,m,3))
@@ -17,22 +18,77 @@ for k in range(3):
     print("Original image, color channel %i:" % k)
     print(A[:,:,k])
 
+# wires are not random
 w = np.random.uniform(0.0, 1.0, (numWires,3))
 for k in range(np.size(w, 0)):
     print("Wire #%i:" % k)
     print(w[k,:])
 
-prob = plp.LpProblem("A weaving problem", plp.LpMinimize)
+def cost(A, Ahat):
+    return np.linalg.norm(A-Ahat)
+
+"""
+w : (n, 3) matrix of wires
+x : 3D vector of wire
+returns : index of closest wire
+"""
+def findClosestWire(w, x):
+    best_d = math.inf
+    best_i = -1
+    for i in range(np.size(w, 0)):
+        d = np.linalg.norm(w[i,:]-x)
+        if (d < best_d):
+            best_i = i
+            best_d = d
+    return best_i
+
+# a heuristic solution
+"""
+A : (n, m, 3) matrix of pixels
+w : (n, 3) matrix of available wires
+resPixel : the amount of partitions in a pixel
+returns : (Ahat, partition)
+partition : (n, m, resPixel)
+"""
+def heuristic(A, w, resPixel):
+    n = np.size(A,0)
+    m = np.size(A,1)
+    numWires = np.size(w, 0)
+    Ahat = np.zeros((n, m, 3))
+    partition = np.zeros((n, m, resPixel))
+    alpha = 1.0/resPixel
+
+    for i in range(n):
+        for j in range(m):
+            solPixel = np.zeros((1,3))
+
+            # find best solution for current pixel
+            for k in range(resPixel):
+                # find closest wire
+                index = findClosestWire(w, A[i,j,:])
+                solPixel = solPixel + alpha*w[index, :]
+                partition[i,j,k] = index
+
+            Ahat[i,j,:] = solPixel
+
+    return (Ahat, partition)
+
+(Ahat, partition) = heuristic(A, w, resPixel)
+print("Heuristic solution has error: %.2f" % cost(A, Ahat))
+
+print(A-Ahat)
+
+# prob = plp.LpProblem("A weaving problem", plp.LpMinimize)
 
 # Let's assume for simplicity, the available wires are fixed for now.
 # Every pixel in the fabric is divided in resPixel amount of partitions.
 # This gives rise to: n*m*resPixel number of variables.
-mapping = {}
-for i in range(n):
-    for j in range(m):
-        for k in range(resPixel):
-            name = "{},{},{}".format(i, j, k)
-            mapping[name] = plp.LpVariable(name, lowBound = 0, upBound = numWires, cat = 'Integer')
+# mapping = {}
+# for i in range(n):
+    # for j in range(m):
+        # for k in range(resPixel):
+            # name = "{},{},{}".format(i, j, k)
+            # mapping[name] = plp.LpVariable(name, lowBound = 0, upBound = numWires, cat = 'Integer')
 
 # todo: add function we need to optimize
 
