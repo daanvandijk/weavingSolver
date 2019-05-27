@@ -1,6 +1,6 @@
-from scipy.optimize import linprog
+# from scipy.optimize import linprog
 import numpy as np
-import pulp as plp
+# import pulp as plp
 import math
 import itertools
 

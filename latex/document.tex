@@ -1,0 +1,42 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\begin{document}
+	\subsection*{Quadratic programming}
+	The problem description of quadratic programming is as follows:
+	\begin{align*}
+	\min {1 \over 2} x^T Q x + c^T x\\
+	\text{subject to } Ax \leq b
+	\end{align*}
+	
+	\subsection*{Simplified model}
+	We have a collection of wires $\{w_i\}_{i \in I} \subset \R^3$, from which our machine can use a finite amount, say $N \in \N$.
+	Given is a target image $\{a_j\}_{j \in J}$ that we want to approximate as best as possible.
+	Our approximation is denoted as follows:
+	\begin{equation}
+	\hat{a}_{j \in J} = {1 \over N} \sum_{k=1}^{N} w_{j_k} 
+	\end{equation}
+	Where the cardinality of the set $\{w_{j_k}; \, j\in J \text{ and } 1 \leq k \leq N \}$ is at most $N$.
+	We want to minimize the following term:
+	\begin{equation}
+	\sum_{j\in J} || \hat{a}_j - a_j || 
+	\end{equation}
+	
+	\subsection*{Local solution}
+	\begin{lstlisting}[caption={A algorithm to find a local solution},basicstyle=\small]
+function localSearch(a, N) {
+   C = convexHull(a)
+   ahat = PickRandom(C, N)
+   while (improving) {
+      remove a random point from ahat
+      find a new point in ahat
+   }
+}
+	\end{lstlisting}
+\end{document}
