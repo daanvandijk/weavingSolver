@@ -1,5 +1,6 @@
 # from scipy.optimize import linprog
 import numpy as np
+from scipy.spatial import ConvexHull
 # import pulp as plp
 import math
 import itertools
@@ -7,17 +8,16 @@ import itertools
 print("Weaving problem")
 
 # configuration
-n = 5 # first dimension of the image
-m = 5 # second dimension of the image
+n = 10 # first dimension of the image
 resPixel = 5
 numWires = 5 
 
-# A = np.zeros((n, m, 3))
-A = np.random.uniform(0.0, 1.0, (n,m,3))
+# A = np.zeros((n 3))
+A = np.random.uniform(0.0, 1.0, (n,3))
 
 for k in range(3):
     print("Original image, color channel %i:" % k)
-    print(A[:,:,k])
+    print(A[:,k])
 
 def generateWires(k):
     X = np.linspace(0.0, 1.0, k)
@@ -82,7 +82,28 @@ def heuristic(A, w, resPixel):
 
     return (Ahat, partition)
 
-(Ahat, partition) = heuristic(A, w, resPixel)
-print("Heuristic solution has error: ",  cost(A, Ahat))
+# (Ahat, partition) = heuristic(A, w, resPixel)
+# print("Heuristic solution has error: ",  cost(A, Ahat))
 
-print(A-Ahat)
+"""
+Checks if a point is in a convex hull
+https://stackoverflow.com/questions/51771248/checking-if-a-point-is-in-convexhull#51786843
+"""
+def pointInHull(point, hull, tolerance=1e-12):
+    return all(
+        (np.dot(eq[:-1], point) + eq[-1] <= tolerance)
+        for eq in hull.equations)
+
+"""
+w : (n, 3) matrix of available wires
+"""
+def localSearch(A, w, N):
+    hull = ConvexHull(A)
+    numWires = np.size(w,0)
+    goodWires = (x for x in w if pointInHull(x, hull))
+
+    # for x in goodWires:
+        # print(pointInHull(x, hull))
+    
+localSearch(A, w, 5)
+# print(A-Ahat)
