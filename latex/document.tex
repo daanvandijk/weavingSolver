@@ -29,6 +29,31 @@
 	\end{equation}
 	
 	\subsection*{Local solution}
+	Suppose optimizing the following
+	\begin{equation*}
+	\min_{w \in [0,1]^3} \sum_{j \in J} \left\lVert a_j - {1 \over N} \sum_{k=1}^{N-1} w_{j_k} - {w \over N} \right\rVert
+	\end{equation*}
+	For simplicity, notate it as follows
+	\begin{equation*}
+	\min_{w \in [0,1]^3} \sum_{j \in J} ||\alpha_j - w||
+	\end{equation*}
+	If we use the $L^1$-norm, then this problem is equivalent to, since $J$ is countable;
+	\begin{equation*}
+	\min_{w \in [0,1]^3} \sum_{j \in J} \sum_{k=1}^{3} |\alpha_{j,k} - w_{k}|
+	\end{equation*}
+	And this again is equivalent to;
+	\begin{equation*}
+	\min_{w \in [0,1]^3} |Aw - \beta|
+	\end{equation*}
+	where 
+	\begin{equation}
+	A := \text{id}_{|J|,3}
+	\end{equation}
+	and
+	\begin{equation}
+	\beta := [\alpha_1, \alpha_2, ..., \alpha_{|J|}]
+	\end{equation}
+	And this in the end is a LP-problem, which can be solved with a simplex method. 
 	\begin{lstlisting}[caption={A algorithm to find a local solution},basicstyle=\small]
 function localSearch(a, N) {
    C = convexHull(a)
@@ -39,4 +64,5 @@ function localSearch(a, N) {
    }
 }
 	\end{lstlisting}
+	
 \end{document}

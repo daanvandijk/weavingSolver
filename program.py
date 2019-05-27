@@ -121,6 +121,7 @@ def localSearch(A, w, N):
     print("Local search #{} cost: {}".format(1, error))
 
     # now remove a random wire, and solve the optimization problem
+    # quadratic programming: https://cvxopt.org/userguide/coneprog.html#quadratic-programming
     
 localSearch(A, w, 5)
 # print(A-Ahat)
