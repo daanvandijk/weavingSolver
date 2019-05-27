@@ -14,5 +14,3 @@ _"
 Notice that the colors of the wires can be represented in [0,1]-cubed, which is a Hilbert space.
 Clearly, if the number of available wires is the same as the maximum wires that can be used by the machine, this is a trivial problem.
 This problem becomes interesting when the number of available wires is much greater than the maximal wires that _can_ be used by the machine.
- 
-## Problem description as a quadratic programming problem

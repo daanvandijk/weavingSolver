@@ -53,7 +53,7 @@ def findClosestWire(w, x):
 
 # a heuristic solution
 """
-A : (n, m, 3) matrix of pixels
+A : (n, 3) matrix of pixels
 w : (n, 3) matrix of available wires
 resPixel : the amount of partitions in a pixel
 returns : (Ahat, partition)
@@ -61,24 +61,22 @@ partition : (n, m, resPixel)
 """
 def heuristic(A, w, resPixel):
     n = np.size(A,0)
-    m = np.size(A,1)
     numWires = np.size(w, 0)
-    Ahat = np.zeros((n, m, 3))
-    partition = np.zeros((n, m, resPixel))
+    Ahat = np.zeros((n, 3))
+    partition = np.zeros((n, resPixel))
     alpha = 1.0/resPixel
 
     for i in range(n):
-        for j in range(m):
-            solPixel = np.zeros((1,3))
+        solPixel = np.zeros((1,3))
 
-            # find best solution for current pixel
-            for k in range(resPixel):
-                # find closest wire
-                index = findClosestWire(w, A[i,j,:])
-                solPixel = solPixel + alpha*w[index, :]
-                partition[i,j,k] = index
+        # find best solution for current pixel
+        for k in range(resPixel):
+            # find closest wire
+            index = findClosestWire(w, A[i,:])
+            solPixel = solPixel + alpha*w[index, :]
+            partition[i,k] = index
 
-            Ahat[i,j,:] = solPixel
+        Ahat[i,:] = solPixel
 
     return (Ahat, partition)
 
@@ -100,10 +98,29 @@ w : (n, 3) matrix of available wires
 def localSearch(A, w, N):
     hull = ConvexHull(A)
     numWires = np.size(w,0)
-    goodWires = (x for x in w if pointInHull(x, hull))
 
-    # for x in goodWires:
-        # print(pointInHull(x, hull))
+    # find the subset wires that are outside the convex hull
+    # todo: add boundary points maybe?
+    goodWires = []
+    for k in range(numWires):
+        if (pointInHull(w[k,:], hull)):
+            goodWires.append(w[k,:])
+
+    # now pick N random points
+    # todo: make this random
+    proposalWires = np.zeros((N, 3))
+    for k in range(N):
+        proposalWires[k,:] = goodWires[k]
+
+    print(proposalWires)
+
+    error = math.inf  
+
+    (Ahat, partition) = heuristic(A, proposalWires, N)
+    error = cost(A, Ahat)
+    print("Local search #{} cost: {}".format(1, error))
+
+    # now remove a random wire, and solve the optimization problem
     
 localSearch(A, w, 5)
 # print(A-Ahat)
