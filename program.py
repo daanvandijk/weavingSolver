@@ -1,6 +1,6 @@
-# from scipy.optimize import linprog
 import numpy as np
 from scipy.spatial import ConvexHull
+from scipy.optimize import linprog
 # import pulp as plp
 import math
 import itertools
@@ -93,6 +93,21 @@ def pointInHull(point, hull, tolerance=1e-12):
         for eq in hull.equations)
 
 """
+Solves the following LP-problem
+min ||Ax-b||_1 s.t. x in R^n
+
+A : (m, n) matrix
+b : (m, 1) matrix
+x : (n, 1) matrix
+"""
+def linearProblem(A, b):
+    m = np.size(A,0)
+    n = np.size(A,1)
+    # xi = [s, x]^T dimension
+    c = np.zeros((2*n,1))
+    A_ub = np.zeros
+    # res = linprog(c, 
+"""
 w : (n, 3) matrix of available wires
 """
 def localSearch(A, w, N):
@@ -122,6 +137,13 @@ def localSearch(A, w, N):
 
     # now remove a random wire, and solve the optimization problem
     # quadratic programming: https://cvxopt.org/userguide/coneprog.html#quadratic-programming
+    # when using a L1-norm, it becomes a linear problem
+    # res = linearProblem(A, b)
     
-localSearch(A, w, 5)
+A = np.zeros((2,2))
+A[0,0] = 1 
+A[1,1] = 2
+b = np.ones((2,1))
+linearProblem(A, b)
+# localSearch(A, w, 5)
 # print(A-Ahat)
