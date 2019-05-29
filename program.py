@@ -96,17 +96,41 @@ def pointInHull(point, hull, tolerance=1e-12):
 Solves the following LP-problem
 min ||Ax-b||_1 s.t. x in R^n
 
-A : (m, n) matrix
-b : (m, 1) matrix
+A : (n, n) matrix
+b : (n, 1) matrix
 x : (n, 1) matrix
 """
 def linearProblem(A, b):
-    m = np.size(A,0)
-    n = np.size(A,1)
-    # xi = [s, x]^T dimension
-    c = np.zeros((2*n,1))
-    A_ub = np.zeros
-    # res = linprog(c, 
+    if (np.size(A,0) != np.size(A,1)):
+        raise Exception("Input matrix must be square")
+    n = np.size(A,0)
+    # xi = [s, x]^T 
+
+    c = np.concatenate((np.ones((n,1)), np.zeros((n,1))))
+    # print("c: ", c)
+
+    # b_ub = [b, -b]
+    b_ub = np.concatenate((b,-b))
+    # print("b_ub: ", b_ub)
+
+    # A_ub = [-I, A;
+    #         -I, -A]
+    A_ub = np.zeros((2*n, 2*n))
+    A_ub[0:n, 0:n] = -np.eye(n)
+    A_ub[n:2*n, 0:n] = -np.eye(n)
+    # print(A)
+    A_ub[0:n, n:2*n] = A
+    A_ub[n:2*n, n:2*n] = -A
+    # print("A_ub: ", A_ub)
+
+    # todo; at bounds to the solution
+
+    res = linprog(c, A_ub=A_ub, b_ub=b_ub)
+    if (res['success'] == True):
+        return res['x'][n:2*n]
+    else:
+        print(res)
+        raise Exception("Linear problem didn't terminate successfully")
 """
 w : (n, 3) matrix of available wires
 """
@@ -138,12 +162,14 @@ def localSearch(A, w, N):
     # now remove a random wire, and solve the optimization problem
     # quadratic programming: https://cvxopt.org/userguide/coneprog.html#quadratic-programming
     # when using a L1-norm, it becomes a linear problem
-    # res = linearProblem(A, b)
+    # sol = linearProblem(A, b)
+
+    # find closest wire available to sol
     
 A = np.zeros((2,2))
 A[0,0] = 1 
 A[1,1] = 2
 b = np.ones((2,1))
 linearProblem(A, b)
-# localSearch(A, w, 5)
+localSearch(A, w, 5)
 # print(A-Ahat)
