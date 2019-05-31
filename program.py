@@ -15,9 +15,9 @@ numWires = 5
 # A = np.zeros((n 3))
 A = np.random.uniform(0.0, 1.0, (n,3))
 
-for k in range(3):
-    print("Original image, color channel %i:" % k)
-    print(A[:,k])
+# for k in range(3):
+    # print("Original image, color channel %i:" % k)
+    # print(A[:,k])
 
 def generateWires(k):
     X = np.linspace(0.0, 1.0, k)
@@ -132,7 +132,9 @@ def linearProblem(A, b):
         print(res)
         raise Exception("Linear problem didn't terminate successfully")
 """
-w : (n, 3) matrix of available wires
+A : (J, 3) matrix of the target image we want to approximate
+w : (I, 3) matrix of available wires
+N : number of wires that can be used by the machine
 """
 def localSearch(A, w, N):
     hull = ConvexHull(A)
@@ -151,7 +153,7 @@ def localSearch(A, w, N):
     for k in range(N):
         proposalWires[k,:] = goodWires[k]
 
-    print(proposalWires)
+    # print(proposalWires)
 
     error = math.inf  
 
@@ -162,14 +164,17 @@ def localSearch(A, w, N):
     # now remove a random wire, and solve the optimization problem
     # quadratic programming: https://cvxopt.org/userguide/coneprog.html#quadratic-programming
     # when using a L1-norm, it becomes a linear problem
-    # sol = linearProblem(A, b)
+    iWire = 0 # remove the zeroth wire
+    J = np.size(A, 0)
+    Ahat = np.zeros((3*J, 3))
+    for k in range(J):
+        Ahat[3*k:3*(k+1),:] = np.eye(3)
+    print("A: ", Ahat)
+    alpha = np.zeros((J*3,1))
+    print("b: ", alpha)
+    # sol = linearProblem((1/N)*np.ones((J,3)), b)
 
     # find closest wire available to sol
     
-A = np.zeros((2,2))
-A[0,0] = 1 
-A[1,1] = 2
-b = np.ones((2,1))
-linearProblem(A, b)
 localSearch(A, w, 5)
 # print(A-Ahat)
