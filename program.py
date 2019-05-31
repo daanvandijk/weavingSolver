@@ -4,6 +4,7 @@ from scipy.optimize import linprog
 # import pulp as plp
 import math
 import itertools
+import unittest
 
 print("Weaving problem")
 
@@ -131,6 +132,25 @@ def linearProblem(A, b):
     else:
         print(res)
         raise Exception("Linear problem didn't terminate successfully")
+
+class testLinearProblem(unittest.TestCase):
+    def testSymmetric(self):
+        A = np.eye(2)
+        b = np.ones((2,1))
+        res = linearProblem(A,b)
+        self.assertTrue(np.size(res, 0) == 2)
+
+    def testAsymmetric(self):
+        A = np.zeros((4,2))
+        b = np.ones((4,1))
+        A[0,:] = [0, 1]
+        A[1,:] = [0.5, 0.5]
+        A[2,:] = [0.75, 0.6]
+        A[3,:] = [0.6, 0.3]
+        res = linearProblem(A,b)
+        self.assertTrue(np.size(res, 0) == 2)
+
+unittest.main()
 """
 A : (J, 3) matrix of the target image we want to approximate
 w : (I, 3) matrix of available wires
@@ -176,5 +196,5 @@ def localSearch(A, w, N):
 
     # find closest wire available to sol
     
-localSearch(A, w, 5)
+# localSearch(A, w, 5)
 # print(A-Ahat)
