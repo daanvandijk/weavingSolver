@@ -97,17 +97,20 @@ def pointInHull(point, hull, tolerance=1e-12):
 Solves the following LP-problem
 min ||Ax-b||_1 s.t. x in R^n
 
-A : (n, n) matrix
-b : (n, 1) matrix
+A : (m, n) matrix
+b : (m, 1) matrix
 x : (n, 1) matrix
 """
 def linearProblem(A, b):
-    if (np.size(A,0) != np.size(A,1)):
-        raise Exception("Input matrix must be square")
-    n = np.size(A,0)
+    m = np.size(A,0)
+    n = np.size(A,1)
+    if (m != np.size(b, 0)):
+        raise Exception("Sizes of A and b don't match")
+    if (1 != np.size(b, 1)):
+        raise Exception("b must be a vector")
     # xi = [s, x]^T 
 
-    c = np.concatenate((np.ones((n,1)), np.zeros((n,1))))
+    c = np.concatenate((np.ones((m,1)), np.zeros((n,1))))
     # print("c: ", c)
 
     # b_ub = [b, -b]
@@ -116,12 +119,12 @@ def linearProblem(A, b):
 
     # A_ub = [-I, A;
     #         -I, -A]
-    A_ub = np.zeros((2*n, 2*n))
-    A_ub[0:n, 0:n] = -np.eye(n)
-    A_ub[n:2*n, 0:n] = -np.eye(n)
-    # print(A)
-    A_ub[0:n, n:2*n] = A
-    A_ub[n:2*n, n:2*n] = -A
+    A_ub = np.zeros((2*m, m+n))
+    A_ub[0:m, 0:m] = -np.eye(m)
+    A_ub[m:2*m, 0:m] = -np.eye(m)
+    # print("A: ", A)
+    A_ub[0:m, m:m+n] = A
+    A_ub[m:2*m, m:m+n] = -A
     # print("A_ub: ", A_ub)
 
     # todo; at bounds to the solution

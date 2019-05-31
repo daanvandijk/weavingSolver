@@ -52,19 +52,22 @@
 	\end{matrix}\right.
 	\label{eq:LP problem}
 	\end{equation}
-	How to implement this r.h.s. of (\ref{eq:LP problem})?
+	We have $A \in \R^{m\times n}$, $x \in \R^n$, $b \in \R^m$ and $s \in \R^m$. 
+	Now the r.h.s. of (\ref{eq:LP problem}) should be turned into canonical LP-formulation.
 	Some linear algebra gives the following:
 	\begin{align*}
 	Ax - b \leq s &\longrightarrow Ax - s \leq b \\
-	&\longrightarrow \begin{bmatrix}-I & A\end{bmatrix} \begin{bmatrix}s\\ x\end{bmatrix} \leq b\\
-	Ax - b \geq -s &\longrightarrow \begin{bmatrix}-I & -A\end{bmatrix} \begin{bmatrix}s\\ x\end{bmatrix} \leq -b
+	&\longrightarrow \begin{bmatrix}-\id_{m} & A\end{bmatrix} \begin{bmatrix}s\\ x\end{bmatrix} \leq b\\
+	Ax - b \geq -s &\longrightarrow \begin{bmatrix}-\id_{m} & -A\end{bmatrix} \begin{bmatrix}s\\ x\end{bmatrix} \leq -b
 	\end{align*}
 	This can be summarized as follows:
 	\begin{equation}
-	\begin{bmatrix}
-	-I & A\\
-	-I & -A
-	\end{bmatrix} 
+	\underbrace{
+		\begin{bmatrix}
+		-\id_{m} & A\\
+		-\id_{m} & -A
+		\end{bmatrix}
+	}_{\text{$2m\times (m+n)$-matrix}}
 	\begin{bmatrix}
 	s\\ x
 	\end{bmatrix} \leq 
@@ -75,12 +78,12 @@
 	\end{equation}
 	Hence the r.h.s. of (\ref{eq:LP problem}) has the following standard form:
 	\begin{align*}
-	&\min_{\xi \in \R^{2n}} \begin{bmatrix}
-	\id_{n} & 0 \cdot \id_{n}
+	&\min_{\xi \in \R^{n+m}} \begin{bmatrix}
+	\id_{m} & 0 \cdot \id_{n}
 	\end{bmatrix} \xi\\
 	\text{subject to}& \begin{bmatrix}
-	-I & A\\
-	-I & -A
+	-\id_{m} & A\\
+	-\id_{m} & -A
 	\end{bmatrix} 
 	\xi \leq 
 	\begin{bmatrix}
