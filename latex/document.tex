@@ -32,11 +32,11 @@
 	Suppose we have an approximation that we want to improve.
 	Take an arbitrary element $v \in \{ w_{j_k} \}$, and consider the following:
 	\begin{equation*}
-	\min_{w \in [0,1]^3} \sum_{j \in J} \left\lVert a_j - {1 \over N} \sum_{w_{j_k} \neq v} w_{j_k} - {w \over N} \right\rVert = \min_{w \in [0,1]^3} \sum_{j \in J} ||\alpha_j - N^{-1} w||
+	\min_{w \in [0,1]^3} \sum_{j \in J} \left\lVert a_j - {1 \over N} \sum_{w_{j_k} \neq v} w_{j_k} - {|\{j; w_{j_k} = v\}| \over N} w \right\rVert = \min_{w \in [0,1]^3} \sum_{j \in J} ||\alpha_j - \beta_j w||
 	\end{equation*}
 	If we use the $L^1$-norm, this can be rewritten to the form:
 	\begin{equation*}
-	\min_{w \in [0,1]^3} |N^{-1}[\id_{3}, ..., \id_{3}]^T \cdot w - [\alpha_1, \alpha_2, ..., \alpha_{|J|}]^T|
+	\min_{w \in [0,1]^3} |[\beta_1 \cdot \id_{3}, ..., \beta_{|J|} \cdot \id_{3}]^T \cdot w - [\alpha_1, ..., \alpha_{|J|}]^T|
 	\end{equation*}
 	And this equation can be rewritten as an LP-problem:
 	\begin{equation}
@@ -91,7 +91,6 @@
 	-b
 	\end{bmatrix}
 	\end{align*}
-	In our case; $A = N^{-1} \text{id}_{|J|,3}$, $x \in \R^3$, $b = [\alpha_1, ..., \alpha_{|J|}]^T \in \R^{3\cdot |J|}$ with $\alpha_j = a_j - {1 \over N} \sum_{w_{j_k} \neq v} w_{j_k}$.
 	\begin{lstlisting}[caption={A algorithm to find a local solution},basicstyle=\small]
 function localSearch(a, N) {
    C = convexHull(a)
