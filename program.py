@@ -2,20 +2,17 @@ import numpy as np
 import itertools
 from shared import *
 import unittest
+import cv2
 
 print("Weaving problem")
 
 # configuration
-n = 10 # number of pixels
-resPixel = 5
-numWires = 5 
+n = 50 # number of pixels
+resPixel = 5 # resolution of pixels
+numWires = 8 # number of wires that can be used by the machine
 
-# A = np.zeros((n 3))
+# generate random picture
 A = np.random.uniform(0.0, 1.0, (n,3))
-
-# for k in range(3):
-    # print("Original image, color channel %i:" % k)
-    # print(A[:,k])
 
 def generateWires(k):
     X = np.linspace(0.0, 1.0, k)
@@ -31,5 +28,4 @@ def generateWires(k):
 w = generateWires(10)
 print("Number of wires: ", np.size(w, 0))
    
-localSearch(A, w, 5)
-# print(A-Ahat)
+localSearch(A, w, numWires)

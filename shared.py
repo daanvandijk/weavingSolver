@@ -125,7 +125,7 @@ partition : (J, resPixel)
 returns (alpha, beta)
 """
 def prepareLocalSolution(diff, w, partition, i):
-    N = np.size(w, 1)
+    N = np.size(w, 0)
     if (i < 0 or i >= N):
         raise Exception("Index i is invalid")
 
@@ -139,8 +139,8 @@ def prepareLocalSolution(diff, w, partition, i):
         c = countWire(partition, j, i)
         alpha[3*j:3*(j+1),:] += w[i]*(c/resPixel)
         beta[j,0] = (c/resPixel)
-    print("beta: ", beta)
-    print("alpha: ", alpha)
+    # print("beta: ", beta)
+    # print("alpha: ", alpha)
     
     return (alpha, beta)
 
@@ -168,15 +168,24 @@ def localSearch(A, w, N):
 
     error = math.inf  
 
-    (Ahat, partition) = heuristic(A, proposalWires, N)
-    error = cost(A, Ahat)
-    print("Local search #{} cost: {}".format(1, error))
+    for iterations in range(3):
+        (Ahat, partition) = heuristic(A, proposalWires, N)
+        error = cost(A, Ahat)
+        print("Local search #{} cost: {}".format(iterations, error))
 
-    # now remove a random wire, and solve the optimization problem
-    # when using a L1-norm, it becomes a linear problem
-    (alpha, beta) = prepareLocalSolution(Ahat-A, proposalWires, partition, 0)
-    sol = linearProblem(alpha, beta)
-    print("Solution: ", sol)
+        indexRemove = np.random.random_integers(0, N-1)
+        print("indexRemove: ", indexRemove)
+        # now remove a random wire, and solve the optimization problem
+        # when using a L1-norm, it becomes a linear problem
+        (alpha, beta) = prepareLocalSolution(Ahat-A, 
+                proposalWires, 
+                partition, 
+                indexRemove)
+        sol = linearProblem(alpha, beta)
+        print("Solution: ", sol)
 
-    # find closest wire available to sol
- 
+        # find closest wire available to sol
+        closestw = findClosestWire(w, sol)
+        print("closest wire: ", w[closestw])
+     
+        proposalWires[indexRemove, :] = w[closestw]
