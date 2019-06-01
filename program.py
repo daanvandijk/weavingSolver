@@ -6,7 +6,7 @@ import unittest
 print("Weaving problem")
 
 # configuration
-n = 10 # first dimension of the image
+n = 10 # number of pixels
 resPixel = 5
 numWires = 5 
 

@@ -34,6 +34,11 @@
 	\begin{equation*}
 	\min_{w \in [0,1]^3} \sum_{j \in J} \left\lVert a_j - {1 \over N} \sum_{w_{j_k} \neq v} w_{j_k} - {|\{j; w_{j_k} = v\}| \over N} w \right\rVert = \min_{w \in [0,1]^3} \sum_{j \in J} ||\alpha_j - \beta_j w||
 	\end{equation*}
+	Therefore we have:
+	\begin{align*}
+	\alpha_j &= \hat{a}_j - a_j + {|\{j; \, w_{j_k} = v \}| \over N}v \in \R^3\\
+	\beta_j &= {|\{j; \, w_{j_k} = v \}| \over N} \in \R
+	\end{align*}
 	If we use the $L^1$-norm, this can be rewritten to the form:
 	\begin{equation*}
 	\min_{w \in [0,1]^3} |[\beta_1 \cdot \id_{3}, ..., \beta_{|J|} \cdot \id_{3}]^T \cdot w - [\alpha_1, ..., \alpha_{|J|}]^T|

@@ -21,13 +21,12 @@ def findClosestWire(w, x):
             best_d = d
     return best_i
 
-# a heuristic solution
 """
 A : (n, 3) matrix of pixels
 w : (n, 3) matrix of available wires
 resPixel : the amount of partitions in a pixel
 returns : (Ahat, partition)
-partition : (n, m, resPixel)
+partition : (n, resPixel)
 """
 def heuristic(A, w, resPixel):
     n = np.size(A,0)
@@ -51,6 +50,19 @@ def heuristic(A, w, resPixel):
     return (Ahat, partition)
 
 """
+Counts number of specified wire used in specified pixel
+partition : (n, resPixel)
+iPixel : index of the pixel
+iWire : index of the wire
+"""
+def countWire(partition, iPixel, iWire):
+    flag = 0
+    for k in range(np.size(partition,1)):
+        if (partition[iPixel, k] == iWire):
+            flag += 1
+    return flag
+
+"""
 Checks if a point is in a convex hull
 https://stackoverflow.com/questions/51771248/checking-if-a-point-is-in-convexhull#51786843
 """
@@ -71,6 +83,8 @@ def linearProblem(A, b):
     m = np.size(A,0)
     n = np.size(A,1)
     if (m != np.size(b, 0)):
+        print("Shape A:", np.shape(A))
+        print("Shape b:", np.shape(b))
         raise Exception("Sizes of A and b don't match")
     if (1 != np.size(b, 1)):
         raise Exception("b must be a vector")
@@ -102,6 +116,33 @@ def linearProblem(A, b):
         print(res)
         raise Exception("Linear problem didn't terminate successfully")
 
+"""
+Preperation for the local solution, see pdf
+i : index to remove
+diff : (J, 3) \hat{a}-a
+w : (N, 3) proposal wires
+partition : (J, resPixel)
+returns (alpha, beta)
+"""
+def prepareLocalSolution(diff, w, partition, i):
+    N = np.size(w, 1)
+    if (i < 0 or i >= N):
+        raise Exception("Index i is invalid")
+
+    J = np.size(diff, 0)
+    resPixel = np.size(partition, 1)
+    beta = np.zeros((J, 1))
+    alpha = diff
+    
+    # loop through pixels
+    for j in range(J):
+        c = countWire(partition, j, i)
+        alpha[3*j:3*(j+1),:] += w[i]*(c/resPixel)
+        beta[j,0] = (c/resPixel)
+    print("beta: ", beta)
+    print("alpha: ", alpha)
+    
+    return (alpha, beta)
 
 """
 A : (J, 3) matrix of the target image we want to approximate
@@ -125,8 +166,6 @@ def localSearch(A, w, N):
     for k in range(N):
         proposalWires[k,:] = goodWires[k]
 
-    # print(proposalWires)
-
     error = math.inf  
 
     (Ahat, partition) = heuristic(A, proposalWires, N)
@@ -134,19 +173,10 @@ def localSearch(A, w, N):
     print("Local search #{} cost: {}".format(1, error))
 
     # now remove a random wire, and solve the optimization problem
-    # quadratic programming: https://cvxopt.org/userguide/coneprog.html#quadratic-programming
     # when using a L1-norm, it becomes a linear problem
-    iWire = 0 # remove the zeroth wire
-    J = np.size(A, 0)
-    Ahat = np.zeros((3*J, 3))
-    beta = np.ones((J, 1))
-    for k in range(J):
-        Ahat[3*k:3*(k+1),:] = beta[k] * np.eye(3)
-    print("A: ", Ahat)
-    alpha = np.zeros((J*3,1))
-    print("b: ", alpha)
-    # approx = Ahat - A
-    # sol = linearProblem((1/N)*np.ones((J,3)), b)
+    (alpha, beta) = prepareLocalSolution(Ahat-A, proposalWires, partition, 0)
+    sol = linearProblem(alpha, beta)
+    print("Solution: ", sol)
 
     # find closest wire available to sol
  
