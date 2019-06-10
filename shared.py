@@ -181,6 +181,9 @@ def localSearch(A, w, N):
                 proposalWires, 
                 partition, 
                 indexRemove)
+        print("alpha size: ", np.shape(alpha))
+        print("beta size: ", np.shape(beta))
+
         sol = linearProblem(alpha, beta)
         print("Solution: ", sol)
 
